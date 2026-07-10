@@ -17,6 +17,14 @@ def load_dataset(uploaded_file):
 
     return pd.read_csv(uploaded_file, encoding="ISO-8859-1")
 
+
+# Check if matplotlib is available for Styler.background_gradient
+try:
+    import matplotlib  # noqa: F401
+    _HAS_MATPLOTLIB = True
+except Exception:
+    _HAS_MATPLOTLIB = False
+
 st.set_page_config(page_title="Superstores!!!", page_icon=":BAR_CHART", layout="wide")
 
 st.title(":bar_chart: Sample SuperStore EDA")
@@ -117,14 +125,20 @@ with col2:
 cl1, cl2 = st.columns(2)
 with cl1:
     with st.expander("Category_ViewData"):
-        st.write(category_df.style.background_gradient(cmap="Blues"))
+        if _HAS_MATPLOTLIB:
+            st.write(category_df.style.background_gradient(cmap="Blues"))
+        else:
+            st.write(category_df)
         csv = category_df.to_csv(index = False).encode('utf-8') 
         st.download_button("Download Data", data = csv, file_name = "Category.csv", mime = "text/csv",
                             help = 'Click here to download the data as a CSV file')
         
 with cl2:
     with st.expander("Region_ViewData"):
-        st.write(region.style.background_gradient(cmap="Oranges"))
+        if _HAS_MATPLOTLIB:
+            st.write(region.style.background_gradient(cmap="Oranges"))
+        else:
+            st.write(region)
         csv = region.to_csv(index = False).encode('utf-8')
         st.download_button("Download Data", data = csv, file_name = "Region.csv", mime = "text/csv",
                             help = 'Click here to download the data in CSV file')
@@ -137,7 +151,10 @@ fig2 = px.line(linechart, x = "month_year", y = "Sales", labels = {"Sales": "Amo
 st.plotly_chart(fig2, use_container_width = True)
 
 with st.expander("View Data of TimeSeries"):
-    st.write(linechart.T.style.background_gradient(cmap="Blues"))
+    if _HAS_MATPLOTLIB:
+        st.write(linechart.T.style.background_gradient(cmap="Blues"))
+    else:
+        st.write(linechart.T)
     csv = linechart.to_csv(index = False).encode('utf-8')
     st.download_button('Download Data', data = csv, file_name = "TimeSeries.csv", mime = "text/csv")
 
@@ -174,7 +191,10 @@ with st.expander("Summary_Table"):
     filtered_df["month"] = filtered_df["Order Date"].dt.month_name()
     sub_category_Year = pd.pivot_table(data = filtered_df, values = "Sales", index = ["Sub-Category"], 
                                        columns = "month")
-    st.write(sub_category_Year.style.background_gradient(cmap="Blues"))
+    if _HAS_MATPLOTLIB:
+        st.write(sub_category_Year.style.background_gradient(cmap="Blues"))
+    else:
+        st.write(sub_category_Year)
 
 #Create a scatter plot
 data1 = px.scatter(filtered_df, x = "Sales", y = "Profit", size = "Quantity")
@@ -189,7 +209,10 @@ data1.update_layout(
 st.plotly_chart(data1, use_container_width = True)
 
 with st.expander("View Data"):
-    st.write(filtered_df.iloc[:500,1:20:2].style.background_gradient(cmap="Blues"))
+    if _HAS_MATPLOTLIB:
+        st.write(filtered_df.iloc[:500,1:20:2].style.background_gradient(cmap="Blues"))
+    else:
+        st.write(filtered_df.iloc[:500,1:20:2])
 
 # Download at the end of the page
 st.markdown("---")
