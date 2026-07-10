@@ -8,6 +8,15 @@ warnings.filterwarnings('ignore')
 
 BASE_DIR = Path(__file__).resolve().parent
 
+
+def load_dataset(uploaded_file):
+    file_name = uploaded_file.name.lower()
+
+    if file_name.endswith((".xlsx", ".xls")):
+        return pd.read_excel(uploaded_file)
+
+    return pd.read_csv(uploaded_file, encoding="ISO-8859-1")
+
 st.set_page_config(page_title="Superstores!!!", page_icon=":BAR_CHART", layout="wide")
 
 st.title(":bar_chart: Sample SuperStore EDA")
@@ -16,7 +25,7 @@ st.markdown('<style>div.block-container{padding-top:2rem;}</style>', unsafe_allo
 fl = st.file_uploader(":file_folder: Upload your  file", type=["csv", "xlsx", "xls", "txt"])
 if fl is not None:
     st.write(fl.name)
-    df = pd.read_csv(fl, encoding= "ISO-8859-1")
+    df = load_dataset(fl)
 
 else:
     df = pd.read_csv(BASE_DIR / "Superstore.csv", encoding= "ISO-8859-1")
